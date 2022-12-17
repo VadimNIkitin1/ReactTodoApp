@@ -13,6 +13,7 @@ export default class App extends Component {
       this.createTodoItem("Build React App"),
       this.createTodoItem("Go walking"),
     ],
+    currentFilter: "all",
   };
   // Функцция создания нового элемента для state
   createTodoItem(label) {
@@ -20,6 +21,7 @@ export default class App extends Component {
       label,
       completed: false,
       id: this.maxID++,
+      createdTime: new Date(),
     };
   }
   // Функция удаления задачи из списка
@@ -58,6 +60,33 @@ export default class App extends Component {
       };
     });
   };
+  // функция очистки выполненых задач
+  onClearCompleted = () => {
+    this.setState(({ todoData }) => {
+      const completedArr = todoData.filter((el) => !el.completed);
+      return {
+        todoData: completedArr,
+      };
+    });
+  };
+
+  onFilterChange = (filter) => {
+    this.setState({ currentFilter: filter });
+  };
+
+  getFilteredTasks() {
+    const { currentFilter, todoData } = this.state;
+    if (currentFilter === "active") {
+      return todoData.filter((el) => !el.completed);
+    }
+
+    if (currentFilter === "completed") {
+      return todoData.filter((el) => el.completed);
+    }
+
+    return todoData;
+  }
+
   render() {
     return (
       <div className="App">
@@ -68,11 +97,18 @@ export default class App extends Component {
           </header>
           <section className="main">
             <TaskList
-              todos={this.state.todoData}
+              todos={this.getFilteredTasks()}
               onDeleted={this.deleteItem}
               onToggleCompleted={this.onToggleCompleted}
             />
-            <Footer todos={this.state.todoData} />
+            <Footer
+              currentFilter={this.state.currentFilter}
+              completedCount={
+                this.state.todoData.filter((el) => !el.completed).length
+              }
+              onClearCompleted={this.onClearCompleted}
+              onFilterChange={this.onFilterChange}
+            />
           </section>
         </section>
       </div>

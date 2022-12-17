@@ -4,13 +4,18 @@ import "./Footer.css";
 
 export default class Footer extends Component {
   render() {
-    const { todos } = this.props;
-    const completedCount = todos.filter((el) => el.completed).length;
+    const { completedCount, onClearCompleted, onFilterChange, currentFilter } =
+      this.props;
     return (
       <footer className="footer">
         <span className="todo-count">{completedCount} Item Left</span>
-        <TasksFilter />
-        <button className="clear-completed">Clear completed</button>
+        <TasksFilter
+          currentFilter={currentFilter}
+          onFilterChange={onFilterChange}
+        />
+        <button className="clear-completed" onClick={onClearCompleted}>
+          Clear completed
+        </button>
       </footer>
     );
   }
