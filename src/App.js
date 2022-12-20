@@ -22,6 +22,7 @@ export default class App extends Component {
       completed: false,
       id: this.maxID++,
       createdTime: new Date(),
+      edit: false,
     };
   }
   // Функция удаления задачи из списка
@@ -60,6 +61,7 @@ export default class App extends Component {
       };
     });
   };
+
   // функция очистки выполненых задач
   onClearCompleted = () => {
     this.setState(({ todoData }) => {
@@ -69,7 +71,7 @@ export default class App extends Component {
       };
     });
   };
-
+  // Функции фильтрации списка задач
   onFilterChange = (filter) => {
     this.setState({ currentFilter: filter });
   };
@@ -87,6 +89,28 @@ export default class App extends Component {
     return todoData;
   }
 
+  changeEditClassName = (id) => {
+    const update = this.state.todoData.map((el) => {
+      if (el.id === id) {
+        el.edit = !el.edit;
+      } else el.edit = false;
+      return el;
+    });
+    this.setState({ todoData: update });
+  };
+
+  changeTodoTask = (id, string) => {
+    const update = this.state.todoData.map((el) => {
+      if (el.id === id) {
+        el.label = string;
+      }
+      el.edit = false;
+      return el;
+    });
+
+    this.setState({ todoData: update });
+  };
+
   render() {
     return (
       <div className="App">
@@ -98,8 +122,10 @@ export default class App extends Component {
           <section className="main">
             <TaskList
               todos={this.getFilteredTasks()}
+              onEdit={this.changeEditClassName}
               onDeleted={this.deleteItem}
               onToggleCompleted={this.onToggleCompleted}
+              changeTodoTask={this.changeTodoTask}
             />
             <Footer
               currentFilter={this.state.currentFilter}

@@ -10,6 +10,7 @@ export default class Task extends Component {
     this.state = { createdString: this.formatTime(props.createdTime) };
   }
 
+  // Функции показателя времени
   componentDidMount() {
     this.timer = setInterval(() => {
       this.setState({
@@ -26,30 +27,67 @@ export default class Task extends Component {
     return formatDistanceToNow(time, { includeSeconds: true });
   }
 
+  state = {
+    label: this.props.label,
+  };
+
+  onLabelEditChange = (e) => {
+    this.setState({
+      label: e.target.value,
+    });
+  };
+
+  onSubmitEdit = (e) => {
+    e.preventDefault();
+    this.props.changeTodoTask(this.props.id, this.state.label);
+  };
+
   render() {
     // Получение свойств
-    const { label, onDeleted, onToggleCompleted, completed } = this.props;
+    const {
+      label,
+      completed,
+      id,
+      onDeleted,
+      onToggleCompleted,
+      edit,
+      changeEditClassName,
+    } = this.props;
     // Добавления класса 'выполнено'
     let completedClassName = "";
     if (completed) {
       completedClassName += "completed";
     }
 
-    return (
+    return !edit ? (
       <li className={completedClassName}>
         <div className="view">
-          <input className="toggle" type="checkbox" />
+          <input
+            className="toggle"
+            type="checkbox"
+            onChange={onToggleCompleted}
+            checked={completed}
+          />
           <label>
-            <span className="description" onClick={onToggleCompleted}>
-              {label}
-            </span>
+            <span className="description">{label}</span>
             <span className="created">{this.state.createdString}</span>
           </label>
-          <button className="icon icon-edit"></button>
+          <button
+            className="icon icon-edit"
+            onClick={() => changeEditClassName(id)}
+          ></button>
           <button className="icon icon-destroy" onClick={onDeleted}></button>
         </div>
-        <input type="text" className="edit" />
       </li>
+    ) : (
+      <form onSubmit={this.onSubmitEdit}>
+        <input
+          className="edit"
+          onChange={this.onLabelEditChange}
+          defaultValue={label}
+          autoFocus
+        />
+      </form>
     );
   }
 }

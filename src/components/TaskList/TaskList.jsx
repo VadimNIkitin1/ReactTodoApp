@@ -4,7 +4,8 @@ import "./TaskList.css";
 
 export default class TaskList extends Component {
   render() {
-    const { todos, onDeleted, onToggleCompleted } = this.props;
+    const { todos, onEdit, onDeleted, onToggleCompleted, changeTodoTask } =
+      this.props;
     const elements = todos.map((el) => {
       const { id, ...elProps } = el;
       return (
@@ -13,6 +14,9 @@ export default class TaskList extends Component {
           key={id}
           onDeleted={() => onDeleted(id)}
           onToggleCompleted={() => onToggleCompleted(id)}
+          changeEditClassName={onEdit}
+          id={id}
+          changeTodoTask={changeTodoTask}
         />
       );
     });
