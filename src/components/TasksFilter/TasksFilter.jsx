@@ -1,7 +1,18 @@
 import { Component } from "react";
+import PropTypes from "prop-types";
 import "./TasksFilter.css";
 
 export default class TasksFilter extends Component {
+  static defaultProps = {
+    currentFilter: "",
+    onFilterChange: () => {},
+  };
+
+  static propTypes = {
+    currentFilter: PropTypes.string,
+    onFilterChange: PropTypes.func,
+  };
+
   render() {
     const { onFilterChange, currentFilter } = this.props;
     return (

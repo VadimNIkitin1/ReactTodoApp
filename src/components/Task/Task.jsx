@@ -1,4 +1,5 @@
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import PropTypes from "prop-types";
 
 import { Component } from "react";
 import "./Task.css";
@@ -7,8 +8,31 @@ export default class Task extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { createdString: this.formatTime(props.createdTime) };
+    this.state = {
+      createdString: this.formatTime(props.createdTime),
+      label: props.label,
+    };
   }
+
+  static defaultProps = {
+    label: "",
+    completed: "",
+    edit: "",
+    id: 0,
+    onDeleted: () => {},
+    onToggleCompleted: () => {},
+    changeEditClassName: () => {},
+  };
+
+  static propTypes = {
+    label: PropTypes.string,
+    completed: PropTypes.bool,
+    edit: PropTypes.bool,
+    id: PropTypes.number,
+    onDeleted: PropTypes.func,
+    onToggleCompleted: PropTypes.func,
+    changeEditClassName: PropTypes.func,
+  };
 
   // Функции показателя времени
   componentDidMount() {
@@ -26,10 +50,7 @@ export default class Task extends Component {
   formatTime(time) {
     return formatDistanceToNow(time, { includeSeconds: true });
   }
-
-  state = {
-    label: this.props.label,
-  };
+  // Функции редактирования задач
 
   onLabelEditChange = (e) => {
     this.setState({
@@ -84,7 +105,7 @@ export default class Task extends Component {
         <input
           className="edit"
           onChange={this.onLabelEditChange}
-          defaultValue={label}
+          value={this.state.label}
           autoFocus
         />
       </form>

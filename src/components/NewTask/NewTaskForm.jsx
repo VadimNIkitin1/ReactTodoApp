@@ -1,7 +1,16 @@
 import { Component } from "react";
+import PropTypes from "prop-types";
 import "./NewTaskForm.css";
 
 export default class NewTaskForm extends Component {
+  static defaultProps = {
+    onAddedItem: () => {},
+  };
+
+  static propTypes = {
+    onAddedItem: PropTypes.func,
+  };
+
   state = {
     label: "",
   };
@@ -11,6 +20,7 @@ export default class NewTaskForm extends Component {
       label: e.target.value,
     });
   };
+
   onSubmit = (e) => {
     e.preventDefault();
     this.props.onAddedItem(this.state.label);

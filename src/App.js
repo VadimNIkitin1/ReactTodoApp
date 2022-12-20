@@ -107,7 +107,6 @@ export default class App extends Component {
       el.edit = false;
       return el;
     });
-
     this.setState({ todoData: update });
   };
 
