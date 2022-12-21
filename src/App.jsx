@@ -1,19 +1,22 @@
-import Footer from "./components/Footer/Footer";
-import NewTaskForm from "./components/NewTask/NewTaskForm";
-import TaskList from "./components/TaskList/TaskList";
-import { Component } from "react";
+import { Component } from 'react';
+
+import Footer from './components/Footer/Footer';
+import NewTaskForm from './components/NewTask/NewTaskForm';
+import TaskList from './components/TaskList/TaskList';
 
 export default class App extends Component {
   // Генерация ID
+
   maxID = 1;
+
   //инициализация состояния приложения
   state = {
     todoData: [
-      this.createTodoItem("Drink Cofee"),
-      this.createTodoItem("Build React App"),
-      this.createTodoItem("Go walking"),
+      this.createTodoItem('Drink Cofee'),
+      this.createTodoItem('Build React App'),
+      this.createTodoItem('Go walking'),
     ],
-    currentFilter: "all",
+    currentFilter: 'all',
   };
   // Функцция создания нового элемента для state
   createTodoItem(label) {
@@ -51,11 +54,7 @@ export default class App extends Component {
       const idx = todoData.findIndex((el) => el.id === id);
       const oldItem = todoData[idx];
       const newItem = { ...oldItem, completed: !oldItem.completed };
-      const newArr = [
-        ...todoData.slice(0, idx),
-        newItem,
-        ...todoData.slice(idx + 1),
-      ];
+      const newArr = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)];
       return {
         todoData: newArr,
       };
@@ -78,11 +77,11 @@ export default class App extends Component {
 
   getFilteredTasks() {
     const { currentFilter, todoData } = this.state;
-    if (currentFilter === "active") {
+    if (currentFilter === 'active') {
       return todoData.filter((el) => !el.completed);
     }
 
-    if (currentFilter === "completed") {
+    if (currentFilter === 'completed') {
       return todoData.filter((el) => el.completed);
     }
 
@@ -128,9 +127,7 @@ export default class App extends Component {
             />
             <Footer
               currentFilter={this.state.currentFilter}
-              completedCount={
-                this.state.todoData.filter((el) => !el.completed).length
-              }
+              completedCount={this.state.todoData.filter((el) => !el.completed).length}
               onClearCompleted={this.onClearCompleted}
               onFilterChange={this.onFilterChange}
             />
