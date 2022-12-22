@@ -60,7 +60,7 @@ export default class App extends Component {
   changeTodoTask = (id, string) => {
     const { todoData } = this.state;
     const update = todoData.map((data) => {
-      const newData = [...data];
+      const newData = { ...data };
       if (newData.id === id) {
         newData.label = string;
       }

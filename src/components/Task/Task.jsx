@@ -33,7 +33,7 @@ export default class Task extends Component {
     super(props);
 
     this.state = {
-      createdString: this.formatTime(props.createdTime),
+      createdString: Task.formatTime(props.createdTime),
       labelNew: props.label,
     };
   }
@@ -43,7 +43,7 @@ export default class Task extends Component {
     this.timer = setInterval(() => {
       const { createdTime } = this.props;
       this.setState({
-        createdString: this.formatTime(createdTime),
+        createdString: Task.formatTime(createdTime),
       });
     }, 5000);
   }
@@ -56,16 +56,16 @@ export default class Task extends Component {
 
   onLabelEditChange = (e) => {
     this.setState({
-      label: e.target.value,
+      labelNew: e.target.value,
     });
   };
 
   onSubmitEdit = (e) => {
     e.preventDefault();
     const { id, changeTodoTask } = this.props;
-    const { label } = this.state;
+    const { labelNew } = this.state;
 
-    changeTodoTask(id, label);
+    changeTodoTask(id, labelNew);
   };
 
   render() {
@@ -82,7 +82,7 @@ export default class Task extends Component {
       <li className={completedClassName}>
         <div className="view">
           <input className="toggle" type="checkbox" onChange={onToggleCompleted} checked={completed} />
-          <span>
+          <span className="wrap">
             <span className="description">{label}</span>
             <span className="created">{createdString}</span>
           </span>

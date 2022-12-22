@@ -6,7 +6,6 @@ import './TaskList.css';
 
 export default class TaskList extends Component {
   static defaultProps = {
-    todos: () => {},
     onEdit: () => {},
     onDeleted: () => {},
     onToggleCompleted: () => {},
@@ -14,7 +13,15 @@ export default class TaskList extends Component {
   };
 
   static propTypes = {
-    todos: PropTypes.arrayOf(),
+    todos: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        completed: PropTypes.bool.isRequired,
+        id: PropTypes.number.isRequired,
+        createdTime: PropTypes.instanceOf(Date).isRequired,
+        edit: PropTypes.bool.isRequired,
+      })
+    ).isRequired,
     onEdit: PropTypes.func,
     onDeleted: PropTypes.func,
     onToggleCompleted: PropTypes.func,
