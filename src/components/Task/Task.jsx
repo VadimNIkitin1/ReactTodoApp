@@ -1,23 +1,14 @@
-import formatDistanceToNow from "date-fns/formatDistanceToNow";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import PropTypes from 'prop-types';
 
-import { Component } from "react";
-import "./Task.css";
+import './Task.css';
 
 export default class Task extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      createdString: this.formatTime(props.createdTime),
-      label: props.label,
-    };
-  }
-
   static defaultProps = {
-    label: "",
-    completed: "",
-    edit: "",
+    label: '',
+    completed: '',
+    edit: '',
     id: 0,
     onDeleted: () => {},
     onToggleCompleted: () => {},
@@ -34,11 +25,25 @@ export default class Task extends Component {
     changeEditClassName: PropTypes.func,
   };
 
+  static formatTime(time) {
+    return formatDistanceToNow(time, { includeSeconds: true });
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      createdString: this.formatTime(props.createdTime),
+      labelNew: props.label,
+    };
+  }
+
   // Функции показателя времени
   componentDidMount() {
     this.timer = setInterval(() => {
+      const { createdTime } = this.props;
       this.setState({
-        createdString: this.formatTime(this.props.createdTime),
+        createdString: this.formatTime(createdTime),
       });
     }, 5000);
   }
@@ -47,9 +52,6 @@ export default class Task extends Component {
     clearInterval(this.timer);
   }
 
-  formatTime(time) {
-    return formatDistanceToNow(time, { includeSeconds: true });
-  }
   // Функции редактирования задач
 
   onLabelEditChange = (e) => {
@@ -60,54 +62,37 @@ export default class Task extends Component {
 
   onSubmitEdit = (e) => {
     e.preventDefault();
-    this.props.changeTodoTask(this.props.id, this.state.label);
+    const { id, changeTodoTask } = this.props;
+    const { label } = this.state;
+
+    changeTodoTask(id, label);
   };
 
   render() {
     // Получение свойств
-    const {
-      label,
-      completed,
-      id,
-      onDeleted,
-      onToggleCompleted,
-      edit,
-      changeEditClassName,
-    } = this.props;
+    const { label, completed, id, onDeleted, onToggleCompleted, edit, changeEditClassName } = this.props;
+    const { createdString, labelNew } = this.state;
     // Добавления класса 'выполнено'
-    let completedClassName = "";
+    let completedClassName = '';
     if (completed) {
-      completedClassName += "completed";
+      completedClassName += 'completed';
     }
 
     return !edit ? (
       <li className={completedClassName}>
         <div className="view">
-          <input
-            className="toggle"
-            type="checkbox"
-            onChange={onToggleCompleted}
-            checked={completed}
-          />
-          <label>
+          <input className="toggle" type="checkbox" onChange={onToggleCompleted} checked={completed} />
+          <span>
             <span className="description">{label}</span>
-            <span className="created">{this.state.createdString}</span>
-          </label>
-          <button
-            className="icon icon-edit"
-            onClick={() => changeEditClassName(id)}
-          ></button>
-          <button className="icon icon-destroy" onClick={onDeleted}></button>
+            <span className="created">{createdString}</span>
+          </span>
+          <button className="icon icon-edit" aria-label="Edit" onClick={() => changeEditClassName(id)} />
+          <button className="icon icon-destroy" aria-label="Delete" onClick={onDeleted} />
         </div>
       </li>
     ) : (
       <form onSubmit={this.onSubmitEdit}>
-        <input
-          className="edit"
-          onChange={this.onLabelEditChange}
-          value={this.state.label}
-          autoFocus
-        />
+        <input className="edit" onChange={this.onLabelEditChange} value={labelNew} />
       </form>
     );
   }

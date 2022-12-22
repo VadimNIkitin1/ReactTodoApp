@@ -1,6 +1,6 @@
-import { Component } from "react";
-import PropTypes from "prop-types";
-import "./NewTaskForm.css";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
+import './NewTaskForm.css';
 
 export default class NewTaskForm extends Component {
   static defaultProps = {
@@ -12,7 +12,7 @@ export default class NewTaskForm extends Component {
   };
 
   state = {
-    label: "",
+    label: '',
   };
 
   onLabelChange = (e) => {
@@ -22,23 +22,20 @@ export default class NewTaskForm extends Component {
   };
 
   onSubmit = (e) => {
+    const { label } = this.state;
+    const { onAddedItem } = this.props;
     e.preventDefault();
-    this.props.onAddedItem(this.state.label);
+    onAddedItem(label);
     this.setState({
-      label: "",
+      label: '',
     });
   };
 
   render() {
+    const { label } = this.state;
     return (
       <form onSubmit={this.onSubmit}>
-        <input
-          className="new-todo"
-          placeholder="What needs to be done?"
-          autoFocus
-          onChange={this.onLabelChange}
-          value={this.state.label}
-        />
+        <input className="new-todo" placeholder="What needs to be done?" onChange={this.onLabelChange} value={label} />
       </form>
     );
   }

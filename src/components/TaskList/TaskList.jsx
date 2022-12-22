@@ -1,7 +1,8 @@
-import { Component } from "react";
-import Task from "../Task/Task";
-import PropTypes from "prop-types";
-import "./TaskList.css";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import Task from '../Task/Task';
+import './TaskList.css';
 
 export default class TaskList extends Component {
   static defaultProps = {
@@ -11,16 +12,17 @@ export default class TaskList extends Component {
     onToggleCompleted: () => {},
     changeTodoTask: () => {},
   };
+
   static propTypes = {
-    todos: PropTypes.array,
+    todos: PropTypes.arrayOf(),
     onEdit: PropTypes.func,
     onDeleted: PropTypes.func,
     onToggleCompleted: PropTypes.func,
     changeTodoTask: PropTypes.func,
   };
+
   render() {
-    const { todos, onEdit, onDeleted, onToggleCompleted, changeTodoTask } =
-      this.props;
+    const { todos, onEdit, onDeleted, onToggleCompleted, changeTodoTask } = this.props;
     const elements = todos.map((el) => {
       const { id, ...elProps } = el;
       return (

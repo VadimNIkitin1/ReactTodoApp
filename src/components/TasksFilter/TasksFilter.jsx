@@ -1,10 +1,10 @@
-import { Component } from "react";
-import PropTypes from "prop-types";
-import "./TasksFilter.css";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
+import './TasksFilter.css';
 
 export default class TasksFilter extends Component {
   static defaultProps = {
-    currentFilter: "",
+    currentFilter: '',
     onFilterChange: () => {},
   };
 
@@ -18,25 +18,19 @@ export default class TasksFilter extends Component {
     return (
       <ul className="filters">
         <li>
-          <button
-            className={currentFilter === "all" ? "selected" : ""}
-            onClick={() => onFilterChange("all")}
-          >
+          <button className={currentFilter === 'all' ? 'selected' : ''} onClick={() => onFilterChange('all')}>
             All
           </button>
         </li>
         <li>
-          <button
-            className={currentFilter === "active" ? "selected" : ""}
-            onClick={() => onFilterChange("active")}
-          >
+          <button className={currentFilter === 'active' ? 'selected' : ''} onClick={() => onFilterChange('active')}>
             Active
           </button>
         </li>
         <li>
           <button
-            className={currentFilter === "completed" ? "selected" : ""}
-            onClick={() => onFilterChange("completed")}
+            className={currentFilter === 'completed' ? 'selected' : ''}
+            onClick={() => onFilterChange('completed')}
           >
             Completed
           </button>
