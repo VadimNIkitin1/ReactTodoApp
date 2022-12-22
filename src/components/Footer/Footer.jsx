@@ -11,12 +11,14 @@ export default class Footer extends Component {
     onClearCompleted: () => {},
     onFilterChange: () => {},
   };
+
   static propTypes = {
     completedCount: PropTypes.number,
     currentFilter: PropTypes.string,
     onClearCompleted: PropTypes.func,
     onFilterChange: PropTypes.func,
   };
+
   render() {
     const { completedCount, onClearCompleted, onFilterChange, currentFilter } = this.props;
     return (
