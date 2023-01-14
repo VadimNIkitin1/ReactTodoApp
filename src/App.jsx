@@ -10,14 +10,45 @@ export default class App extends Component {
   maxID = 1;
 
   // инициализация состояния приложения
+
   state = {
     todoData: [
-      this.createTodoItem('Drink Cofee'),
-      this.createTodoItem('Build React App'),
-      this.createTodoItem('Go walking'),
+      this.createTodoItem('Drink Cofee', 0, 5),
+      this.createTodoItem('Build React App', 1, 5),
+      this.createTodoItem('Go walking', 1, 30),
     ],
     currentFilter: 'all',
   };
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      const { todoData } = this.state;
+      const newTodoData = todoData.map((task) => {
+        const newTask = { ...task };
+        const now = Date.now();
+        const diff = (now - newTask.lastTick) / 1000;
+        if (!task.stopped) {
+          newTask.time += newTask.timeOut ? -diff : diff;
+          newTask.time = Math.max(newTask.time, 0);
+          newTask.lastTick = now;
+        }
+
+        if (newTask.time <= 0 || newTask.completed) {
+          newTask.stopped = true;
+        }
+
+        return newTask;
+      });
+
+      this.setState({
+        todoData: newTodoData,
+      });
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
 
   getFilteredTasks() {
     const { currentFilter, todoData } = this.state;
@@ -31,6 +62,18 @@ export default class App extends Component {
 
     return todoData;
   }
+
+  toggleTimer = (id) => {
+    const { todoData } = this.state;
+    const idx = todoData.findIndex((data) => data.id === id);
+    if (idx === -1) return;
+    const newTodoData = [...todoData];
+    newTodoData[idx].stopped = !newTodoData[idx].stopped;
+    newTodoData[idx].lastTick = Date.now();
+    this.setState({
+      todoData: newTodoData,
+    });
+  };
 
   // Функция удаления задачи из списка
   deleteItem = (id) => {
@@ -71,8 +114,8 @@ export default class App extends Component {
   };
 
   // Функция добавления задачи в список
-  addItem = (text) => {
-    const newItem = this.createTodoItem(text);
+  addItem = (text, min, sec) => {
+    const newItem = this.createTodoItem(text, min, sec);
     this.setState(({ todoData }) => {
       const newArr = [...todoData, newItem];
       return {
@@ -110,9 +153,14 @@ export default class App extends Component {
   };
 
   // Функцция создания нового элемента для state
-  createTodoItem(label) {
+  createTodoItem(label, min, sec) {
+    const time = Number(min) * 60 + Number(sec);
     return {
       label,
+      time,
+      lastTick: 0,
+      timeOut: time !== 0,
+      stopped: true,
       completed: false,
       id: this.maxID++,
       createdTime: new Date(),
@@ -131,6 +179,7 @@ export default class App extends Component {
           </header>
           <section className="main">
             <TaskList
+              toggleTimer={this.toggleTimer}
               todos={this.getFilteredTasks()}
               onEdit={this.changeEditClassName}
               onDeleted={this.deleteItem}
