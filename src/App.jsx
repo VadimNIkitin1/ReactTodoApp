@@ -1,57 +1,62 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 
 import TaskList from './components/TaskList/TaskList';
 import Footer from './components/Footer/Footer';
 import NewTaskForm from './components/NewTask/NewTaskForm';
 
-export default class App extends Component {
-  // Генерация ID
+export default function App() {
+  let maxID = 1;
 
-  maxID = 1;
-
-  // инициализация состояния приложения
-
-  state = {
-    todoData: [
-      this.createTodoItem('Drink Cofee', 0, 5),
-      this.createTodoItem('Build React App', 1, 5),
-      this.createTodoItem('Go walking', 1, 30),
-    ],
-    currentFilter: 'all',
+  const createTodoItem = (label, min, sec) => {
+    const time = Number(min) * 60 + Number(sec);
+    return {
+      label,
+      time,
+      lastTick: 0,
+      timeOut: time !== 0,
+      stopped: true,
+      completed: false,
+      id: maxID++,
+      createdTime: new Date(),
+      edit: false,
+    };
   };
 
-  componentDidMount() {
-    this.interval = setInterval(() => {
-      const { todoData } = this.state;
-      const newTodoData = todoData.map((task) => {
-        const newTask = { ...task };
-        const now = Date.now();
-        const diff = (now - newTask.lastTick) / 1000;
-        if (!task.stopped) {
-          newTask.time += newTask.timeOut ? -diff : diff;
-          newTask.time = Math.max(newTask.time, 0);
-          newTask.lastTick = now;
-        }
+  const [todoData, setTodoData] = useState([
+    createTodoItem('Drink Cofee', 0, 5),
+    createTodoItem('Build React App', 1, 5),
+    createTodoItem('Go walking', 1, 30),
+  ]);
 
-        if (newTask.time <= 0 || newTask.completed) {
-          newTask.stopped = true;
-        }
+  const [currentFilter, setCurrentFilter] = useState('all');
 
-        return newTask;
-      });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTodoData((todoData) => {
+        const newTodoData = todoData.map((task) => {
+          const newTask = { ...task };
+          const now = Date.now();
+          const diff = (now - newTask.lastTick) / 1000;
+          if (!task.stopped) {
+            newTask.time += newTask.timeOut ? -diff : diff;
+            newTask.time = Math.max(newTask.time, 0);
+            newTask.lastTick = now;
+          }
 
-      this.setState({
-        todoData: newTodoData,
+          if (newTask.time <= 0 || newTask.completed) {
+            newTask.stopped = true;
+          }
+
+          return newTask;
+        });
+
+        return newTodoData;
       });
     }, 1000);
-  }
+    return () => clearInterval(interval);
+  }, []);
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  getFilteredTasks() {
-    const { currentFilter, todoData } = this.state;
+  const getFilteredTasks = () => {
     if (currentFilter === 'active') {
       return todoData.filter((el) => !el.completed);
     }
@@ -61,33 +66,26 @@ export default class App extends Component {
     }
 
     return todoData;
-  }
+  };
 
-  toggleTimer = (id) => {
-    const { todoData } = this.state;
+  const toggleTimer = (id) => {
     const idx = todoData.findIndex((data) => data.id === id);
     if (idx === -1) return;
     const newTodoData = [...todoData];
     newTodoData[idx].stopped = !newTodoData[idx].stopped;
     newTodoData[idx].lastTick = Date.now();
-    this.setState({
-      todoData: newTodoData,
-    });
+    setTodoData(newTodoData);
   };
 
-  // Функция удаления задачи из списка
-  deleteItem = (id) => {
-    this.setState(({ todoData }) => {
+  const deleteItem = (id) => {
+    setTodoData((todoData) => {
       const idx = todoData.findIndex((el) => el.id === id);
       const newArr = [...todoData.slice(0, idx), ...todoData.slice(idx + 1)];
-      return {
-        todoData: newArr,
-      };
+      return newArr;
     });
   };
 
-  changeEditClassName = (id) => {
-    const { todoData } = this.state;
+  const changeEditClassName = (id) => {
     const update = todoData.map((data) => {
       const newData = data;
       if (newData.id === id) {
@@ -97,11 +95,10 @@ export default class App extends Component {
       }
       return newData;
     });
-    this.setState({ todoData: update });
+    setTodoData(update);
   };
 
-  changeTodoTask = (id, string) => {
-    const { todoData } = this.state;
+  const changeTodoTask = (id, string) => {
     const update = todoData.map((data) => {
       const newData = { ...data };
       if (newData.id === id) {
@@ -110,91 +107,59 @@ export default class App extends Component {
       newData.edit = false;
       return newData;
     });
-    this.setState({ todoData: update });
+    setTodoData(update);
   };
 
-  // Функция добавления задачи в список
-  addItem = (text, min, sec) => {
-    const newItem = this.createTodoItem(text, min, sec);
-    this.setState(({ todoData }) => {
+  const addItem = (text, min, sec) => {
+    const newItem = createTodoItem(text, min, sec);
+    setTodoData((todoData) => {
       const newArr = [...todoData, newItem];
-      return {
-        todoData: newArr,
-      };
+      return newArr;
     });
   };
 
-  // Функция смены задачи на 'выполнено'
-  onToggleCompleted = (id) => {
-    this.setState(({ todoData }) => {
+  const onToggleCompleted = (id) => {
+    setTodoData((todoData) => {
       const idx = todoData.findIndex((el) => el.id === id);
       const oldItem = todoData[idx];
       const newItem = { ...oldItem, completed: !oldItem.completed };
       const newArr = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)];
-      return {
-        todoData: newArr,
-      };
+      return newArr;
     });
   };
 
-  // функция очистки выполненых задач
-  onClearCompleted = () => {
-    this.setState(({ todoData }) => {
-      const completedArr = todoData.filter((el) => !el.completed);
-      return {
-        todoData: completedArr,
-      };
-    });
+  const onClearCompleted = () => {
+    setTodoData((todoData) => todoData.filter((el) => !el.completed));
   };
 
-  // Функции фильтрации списка задач
-  onFilterChange = (filter) => {
-    this.setState({ currentFilter: filter });
+  const onFilterChange = (filter) => {
+    setCurrentFilter(filter);
   };
 
-  // Функцция создания нового элемента для state
-  createTodoItem(label, min, sec) {
-    const time = Number(min) * 60 + Number(sec);
-    return {
-      label,
-      time,
-      lastTick: 0,
-      timeOut: time !== 0,
-      stopped: true,
-      completed: false,
-      id: this.maxID++,
-      createdTime: new Date(),
-      edit: false,
-    };
-  }
-
-  render() {
-    const { currentFilter, todoData } = this.state;
-    return (
-      <div className="App">
-        <section className="todoapp">
-          <header className="header">
-            <h1>todos</h1>
-            <NewTaskForm onAddedItem={this.addItem} />
-          </header>
-          <section className="main">
-            <TaskList
-              toggleTimer={this.toggleTimer}
-              todos={this.getFilteredTasks()}
-              onEdit={this.changeEditClassName}
-              onDeleted={this.deleteItem}
-              onToggleCompleted={this.onToggleCompleted}
-              changeTodoTask={this.changeTodoTask}
-            />
-            <Footer
-              currentFilter={currentFilter}
-              completedCount={todoData.filter((el) => !el.completed).length}
-              onClearCompleted={this.onClearCompleted}
-              onFilterChange={this.onFilterChange}
-            />
-          </section>
+  return (
+    <div className="App">
+      <section className="todoapp">
+        <header className="header">
+          <h1>todos</h1>
+          <NewTaskForm onAddedItem={addItem} />
+        </header>
+        <section className="main">
+          <TaskList
+            toggleTimer={toggleTimer}
+            todos={getFilteredTasks()}
+            onEdit={changeEditClassName}
+            onDeleted={deleteItem}
+            onToggleCompleted={onToggleCompleted}
+            changeTodoTask={changeTodoTask}
+          />
+          <Footer
+            currentFilter={currentFilter}
+            completedCount={todoData.filter((el) => !el.completed).length}
+            onClearCompleted={onClearCompleted}
+            onFilterChange={onFilterChange}
+          />
         </section>
-      </div>
-    );
-  }
+      </section>
+    </div>
+  );
 }
